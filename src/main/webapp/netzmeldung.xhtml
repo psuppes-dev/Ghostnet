@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+
+<h:head>
+    <title>Geisternetz melden</title>
+
+    <h:outputStylesheet>
+        /* Style deaktivierte Felder */
+        .disabled-input {
+            background-color: #d3d3d3 !important;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    </h:outputStylesheet>
+
+    <h:outputScript>
+        function toggleFields() {
+            var checkbox = document.getElementById('form:anonym');
+            var vorname = document.getElementById('form:vorname');
+            var nachname = document.getElementById('form:nachname');
+            var telefon = document.getElementById('form:telefon');
+
+            if (checkbox.checked) {
+                vorname.value = '';
+                nachname.value = '';
+                telefon.value = '';
+
+                vorname.setAttribute('disabled', 'true');
+                nachname.setAttribute('disabled', 'true');
+                telefon.setAttribute('disabled', 'true');
+
+                vorname.classList.add('disabled-input');
+                nachname.classList.add('disabled-input');
+                telefon.classList.add('disabled-input');
+            } else {
+                vorname.removeAttribute('disabled');
+                nachname.removeAttribute('disabled');
+                telefon.removeAttribute('disabled');
+
+                vorname.classList.remove('disabled-input');
+                nachname.classList.remove('disabled-input');
+                telefon.classList.remove('disabled-input');
+            }
+        }
+    </h:outputScript>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        body { font-family: Arial, sans-serif; background: #181818; color: #fff; margin: 0; }
+        .navbar {
+            display: flex;
+            background: #111;
+            padding: 10px 20px;
+            align-items: center;
+            gap: 20px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .navbar a:hover {
+            background: #333;
+            border-radius: 5px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #2c2c2c;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            background: #3c3c3c;
+            border: 1px solid #555;
+            color: white;
+            border-radius: 4px;
+        }
+        button {
+            margin-top: 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        h1 {
+            color: #4da6ff;
+            margin-bottom: 20px;
+        }
+        .melde-button:hover {
+            background-color: #4da6ff;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+    <!-- Navigation -->
+    <div class="navbar">
+        <h:link outcome="index" value="">
+            <i class="fas fa-home"></i> Startseite
+        </h:link>
+        <h:link outcome="karte" value="">
+            <i class="fas fa-map-marked-alt"></i> Karte
+        </h:link>
+        <h:link outcome="datenbank" value="">
+            <i class="fas fa-database"></i> Datenbank
+        </h:link>
+        <h:link outcome="netzmeldung" value="">
+            <i class="fas fa-exclamation-triangle"></i> Netzmeldung
+        </h:link>
+        <h:link outcome="faq" value="">
+            <i class="fas fa-question-circle"></i> FAQ
+        </h:link>
+    </div>
+
+    <div class="container">
+        <h1>Geisternetz melden</h1>
+        <h:form id="form">
+            <!-- Checkbox für Anonym -->
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+                <label for="anonym" style="margin: 0; font-weight: bold;">Anonym melden</label>
+                <h:selectBooleanCheckbox id="anonym" value="#{geisternetzController.meldendePerson.anonym}"
+                                         onclick="toggleFields()" />
+            </div>
+
+            <!-- Felder für Info´s -->
+            <label for="vorname">Vorname</label>
+            <h:inputText id="vorname" value="#{geisternetzController.meldendePerson.vorname}">
+            <f:passThroughAttribute name="placeholder" value="Max" />
+            </h:inputText>
+
+            <label for="nachname">Nachname</label>
+            <h:inputText id="nachname" value="#{geisternetzController.meldendePerson.nachname}">
+                <f:passThroughAttribute name="placeholder" value="Mustermann" />
+            </h:inputText>
+
+            <label for="telefon">Telefonnummer (mit Landesvorwahl) </label>
+            <h:inputText id="telefon" value="#{geisternetzController.meldendePerson.telefon}">
+            <f:passThroughAttribute name="placeholder" value="+49 1234567890" />
+            </h:inputText>
+
+            <h:messages globalOnly="true" style="color:red"/>
+
+            <label for="sichtungszeit">Sichtungszeitpunkt (GMT+1) *</label>
+            <h:inputText id="sichtungszeit"
+                         value="#{geisternetzController.geisternetz.sichtungszeitpunkt}"
+                         required="true">
+                <f:convertDateTime pattern="yyyy-MM-dd'T'HH:mm" type="localDateTime"/>
+                <f:passThroughAttribute name="type" value="datetime-local"/>
+            </h:inputText>
+            <h:message for="sichtungszeit" style="color:red"/>
+
+            <label for="latitude">Breitengrad (-90.0 bis +90.0) *</label>
+            <h:inputText id="latitude" value="#{geisternetzController.geisternetz.latitude}" required="true" >
+                <f:passThroughAttribute name="placeholder" value="0.00000" />
+                <f:validateDoubleRange minimum="-90.0" maximum="90.0"/>
+            </h:inputText>
+            <h:message for="latitude" style="color:red"/>
+
+            <label for="longitude">Längengrad (-180.0 bis +180.0) *</label>
+            <h:inputText id="longitude" value="#{geisternetzController.geisternetz.longitude}" required="true" >
+                <f:passThroughAttribute name="placeholder" value="0.00000" />
+                <f:validateDoubleRange minimum="-180.0" maximum="180.0"/>
+            </h:inputText>
+            <h:message for="longitude" style="color:red"/>
+
+            <label for="groesse">Größe (in Meter) *</label>
+            <h:inputText id="groesse" value="#{geisternetzController.geisternetz.groesse}" required="true" >
+                <f:passThroughAttribute name="placeholder" value="1" />
+                <f:validateLongRange minimum="1"/>
+            </h:inputText>
+            <h:message for="groesse" style="color:red"/>
+
+            <h:commandButton value="Melden" action="#{geisternetzController.melden}" styleClass="melde-button"/>
+
+            <p style="margin-top:10px; font-size:0.95em;">
+                Falls du Hilfe beim Umrechnen der Koordinaten brauchst, nutze gerne den
+                <a href="https://www.koordinaten-umrechner.de/" target="_blank" style="color:#4da6ff; text-decoration:underline;">
+                    Koordinaten-Umrechner
+                </a>
+            </p>
+        </h:form>
+    </div>
+</h:body>
+</html>

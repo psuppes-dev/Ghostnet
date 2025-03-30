@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <title>Geisternetze Karte</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        body { font-family: Arial, sans-serif; background: #181818; color: #fff; margin: 0; }
+        .navbar {
+            display: flex;
+            background: #111;
+            padding: 10px 20px;
+            align-items: center;
+            gap: 20px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .navbar a:hover {
+            background: #333;
+            border-radius: 5px;
+        }
+        #map {
+            height: 600px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        .leaflet-popup-content strong {
+            color: #000000;
+        }
+        .popup-actions button {
+            margin: 5px;
+            padding: 8px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+        }
+        #bergung-formular, #erfolgte-bergung-formular {
+            display: none;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+            color: white;
+        }
+        h3 {
+            color: #4da6ff;
+            margin-bottom: 20px;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+    <!-- Navigation -->
+    <div class="navbar">
+        <h:link outcome="index" value="">
+            <i class="fas fa-home"></i> Startseite
+        </h:link>
+        <h:link outcome="karte" value="">
+            <i class="fas fa-map-marked-alt"></i> Karte
+        </h:link>
+        <h:link outcome="datenbank" value="">
+            <i class="fas fa-database"></i> Datenbank
+        </h:link>
+        <h:link outcome="netzmeldung" value="">
+            <i class="fas fa-exclamation-triangle"></i> Netzmeldung
+        </h:link>
+        <h:link outcome="faq" value="">
+            <i class="fas fa-question-circle"></i> FAQ
+        </h:link>
+    </div>
+
+    <h:form id="karteForm">
+        <div id="map"></div>
+        <!-- JavaScript-Array mit allen nicht geborgenen Geisternetzen -->
+        <h:outputScript target="body">
+            const netze = [
+            <ui:repeat value="#{geisternetzController.alleGeisternetze}" var="netz" varStatus="loop">
+                <ui:fragment rendered="#{netz.status ne 'GEBORGEN'}"> <!-- Zeige nur nicht geborgene -->
+                {
+                "id": "#{netz.id}",
+                "latitude": "#{netz.latitude}",
+                "longitude": "#{netz.longitude}",
+                "status": "#{netz.status}",
+                "durchmesser": "#{netz.groesse}",
+                "letzteSichtung": "#{netz.sichtungszeitpunkt}"
+                }#{loop.last ? '' : ','}
+                </ui:fragment>
+            </ui:repeat>
+            ];
+
+            // Karte initialisieren und Layer hinzufügen
+            document.addEventListener("DOMContentLoaded", function () {
+            const map = L.map('map').setView([51.1657, 10.4515], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Icons für verschiedene Status setzen
+            const iconGemeldet = L.icon({
+            iconUrl: 'resources/images/gemeldet.png',
+            iconSize: [30, 40],
+            iconAnchor: [15, 40],
+            popupAnchor: [0, -40]
+            });
+            const iconBevorstehend = L.icon({
+            iconUrl: 'resources/images/bevorstehend.png',
+            iconSize: [30, 40],
+            iconAnchor: [15, 40],
+            popupAnchor: [0, -40]
+            });
+            const iconVerschollen = L.icon({
+            iconUrl: 'resources/images/verschollen.png',
+            iconSize: [30, 40],
+            iconAnchor: [15, 40],
+            popupAnchor: [0, -40]
+            });
+
+            // Marker setzen
+            netze.forEach(function (netz) {
+            if (netz.latitude !== null &amp;&amp; netz.longitude !== null) {
+            let icon;
+            if (netz.status === "GEMELDET") {
+            icon = iconGemeldet;
+            } else if (netz.status === "BERGUNG_BEVORSTEHEND") {
+            icon = iconBevorstehend;
+            } else if (netz.status === "VERSCHOLLEN") {
+            icon = iconVerschollen;
+            } else {
+            icon = iconGemeldet; // Fallback
+            }
+
+            // Inhalt des Popups für den Marker
+            let popupContent =
+            "&lt;strong&gt;Geisternetz ID:&lt;/strong&gt; " + netz.id + "&lt;br/&gt;" +
+            "&lt;strong&gt;Status:&lt;/strong&gt; " + netz.status + "&lt;br/&gt;" +
+            "&lt;strong&gt;Durchmesser:&lt;/strong&gt; " + netz.durchmesser + " m&lt;br/&gt;" +
+            "&lt;strong&gt;Letzte Sichtung:&lt;/strong&gt; " + (netz.letzteSichtung ? netz.letzteSichtung : "n.a.") + "&lt;br/&gt;" +
+            "&lt;strong&gt;Breitengrad:&lt;/strong&gt; " + netz.latitude + "&lt;br/&gt;" +
+            "&lt;strong&gt;Längengrad:&lt;/strong&gt; " + netz.longitude + "&lt;br/&gt;";
+
+            // Button je nach Status setzen
+            if (netz.status === "GEMELDET") {
+            popupContent +=
+            '&lt;button type=&quot;button&quot; style=&quot;background: #ffc107; color: #000; border: none; padding: 8px; border-radius: 5px; cursor: pointer;&quot; ' +
+            'onclick=&quot;zeigeBergungFormular(' + netz.id + ')&quot;&gt; 🟡 Geplante Bergung&lt;/button&gt;';
+            } else if (netz.status === "BERGUNG_BEVORSTEHEND") {
+            popupContent +=
+            '&lt;button type=&quot;button&quot; class=&quot;bergung-button&quot; ' +
+            'style=&quot;background: #28a745; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer;&quot; ' +
+            'onclick=&quot;zeigeErfolgteBergungFormular(' + netz.id + ')&quot;&gt;✅ Erfolgte Bergung&lt;/button&gt;';
+            }
+
+            L.marker([netz.latitude, netz.longitude], { icon: icon }).addTo(map)
+            .bindPopup(popupContent);
+            }
+            });
+            });
+
+            function zeigeBergungFormular(netzId) {
+            document.getElementById('bergung-formular').style.display = 'block';
+            document.getElementById('erfolgte-bergung-formular').style.display = 'none';
+
+            setTimeout(() => {
+            let netzIdField = document.querySelector('[id$="netz-id-hidden"]');
+
+            if (netzIdField) {
+            netzIdField.value = netzId;
+            console.log("Netz-ID gesetzt: " + netzId);
+            } else {
+            console.error("Fehler: Verstecktes Eingabefeld für Netz-ID nicht gefunden!");
+            }
+            }, 100);
+            }
+
+            function zeigeErfolgteBergungFormular(netzId) {
+            document.getElementById('bergung-formular').style.display = 'none';
+            document.getElementById('erfolgte-bergung-formular').style.display = 'block';
+            }
+        </h:outputScript>
+    </h:form>
+
+    <!-- FORMULAR für geplante Bergung -->
+    <h:form id="bergungForm">
+        <div id="bergung-formular">
+            <h3>Geplante Bergung Melden</h3>
+
+            <h:panelGrid columns="2">
+                <h:outputLabel for="netz-id-hidden" value="Netz-ID"/>
+                <h:inputText id="netz-id-hidden" value="#{bergungsController.ausgewähltesGeisternetzId}" />
+
+                <h:outputLabel for="vorname" value="Vorname"/>
+                <h:inputText id="vorname" value="#{bergungsController.planendePerson.vorname}" required="true">
+                    <f:passThroughAttribute name="placeholder" value="Max" />
+                </h:inputText>
+
+                <h:outputLabel for="nachname" value="Nachname"/>
+                <h:inputText id="nachname" value="#{bergungsController.planendePerson.nachname}" required="true">
+                    <f:passThroughAttribute name="placeholder" value="Mustermann" />
+                </h:inputText>
+
+                <h:outputLabel for="telefon" value="Telefonnummer"/>
+                <h:inputText id="telefon" value="#{bergungsController.planendePerson.telefon}" required="true">
+                    <f:passThroughAttribute name="placeholder" value="+49 1234567890" />
+                </h:inputText>
+            </h:panelGrid>
+
+            <h:commandButton value="Bergung eintragen" action="#{bergungsController.planeBergung}" />
+
+        </div>
+    </h:form>
+
+    <!-- NEUES FORMULAR für erfolgte Bergung -->
+    <h:form id="erfolgteBergungForm">
+        <div id="erfolgte-bergung-formular">
+            <h3>Erfolgte Bergung Melden</h3>
+
+            <h:panelGrid columns="2">
+                <h:outputLabel for="erfolgte-netz-id-hidden" value="Netz-ID"/>
+                <h:inputText id="erfolgte-netz-id-hidden" value="#{bergungsController.ausgewähltesGeisternetzId}" />
+
+                <h:outputLabel for="erfolgte-vorname" value="Vorname"/>
+                <h:inputText id="erfolgte-vorname" value="#{bergungsController.bergendePerson.vorname}" required="true">
+                    <f:passThroughAttribute name="placeholder" value="Max" />
+                </h:inputText>
+
+                <h:outputLabel for="erfolgte-nachname" value="Nachname"/>
+                <h:inputText id="erfolgte-nachname" value="#{bergungsController.bergendePerson.nachname}" required="true">
+                    <f:passThroughAttribute name="placeholder" value="Mustermann" />
+                </h:inputText>
+
+                <h:outputLabel for="erfolgte-telefon" value="Telefonnummer"/>
+                <h:inputText id="erfolgte-telefon" value="#{bergungsController.bergendePerson.telefon}" required="true">
+                    <f:passThroughAttribute name="placeholder" value="+49 1234567890" />
+                </h:inputText>
+
+                <h:outputLabel for="bergungszeitpunkt" value="Bergungszeitpunkt (GMT+1)"/>
+                <h:inputText id="bergungszeitpunkt" value="#{bergungsController.bergungszeitpunkt}" required="true">
+                    <f:convertDateTime pattern="yyyy-MM-dd'T'HH:mm" type="localDateTime"/>
+                    <f:passThroughAttribute name="type" value="datetime-local"/>
+                </h:inputText>
+            </h:panelGrid>
+
+            <h:commandButton value="Bergung bestätigen" action="#{bergungsController.alsGeborgenMelden}">
+                <f:ajax execute="@all" render="erfolgte-bergung-formular"/>
+            </h:commandButton>
+        </div>
+    </h:form>
+</h:body>
+
+</html>

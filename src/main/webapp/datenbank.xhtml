@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Datenbankübersicht</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #181818;
+            color: #fff;
+            margin: 0;
+        }
+
+        .navbar {
+            display: flex;
+            background: #111;
+            padding: 10px 20px;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar a:hover {
+            background: #333;
+            border-radius: 5px;
+        }
+
+        h1 {
+            color: #4da6ff;
+            margin: 20px;
+        }
+
+        table {
+            width: 100%;
+            margin: auto;
+            border-collapse: collapse;
+            background-color: #1f1f1f;
+            color: #ddd;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            border: 1px solid #444;
+            text-align: left;
+        }
+
+        th {
+            background-color: #2d2d2d;
+            color: #ffffff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #2a2a2a;
+        }
+
+        tr:hover {
+            background-color: #3a3a3a;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+    <!-- Navigation -->
+    <div class="navbar">
+        <h:link outcome="index" value="">
+            <i class="fas fa-home"></i> Startseite
+        </h:link>
+        <h:link outcome="karte" value="">
+            <i class="fas fa-map-marked-alt"></i> Karte
+        </h:link>
+        <h:link outcome="datenbank" value="">
+            <i class="fas fa-database"></i> Datenbank
+        </h:link>
+        <h:link outcome="netzmeldung" value="">
+            <i class="fas fa-exclamation-triangle"></i> Netzmeldung
+        </h:link>
+        <h:link outcome="faq" value="">
+            <i class="fas fa-question-circle"></i> FAQ
+        </h:link>
+    </div>
+
+    <h1>Gemeldete Geisternetze</h1>
+
+    <h:form id="statusFilterForm">
+
+        <h:dataTable value="#{geisternetzController.gefilterteGeisternetze}" var="netz" styleClass="table">
+
+            <!-- Spalte: Längengrad -->
+            <h:column>
+                <f:facet name="header">Längengrad</f:facet>
+                #{netz.longitude}
+            </h:column>
+
+            <!-- Spalte: Breitengrad -->
+            <h:column>
+                <f:facet name="header">Breitengrad</f:facet>
+                #{netz.latitude}
+            </h:column>
+
+            <!-- Spalte: Durchmesser -->
+            <h:column>
+                <f:facet name="header">Durchmesser</f:facet>
+                #{netz.groesse}
+            </h:column>
+
+            <!-- Spalte: Status + Dropdown + Button -->
+            <h:column>
+                <f:facet name="header">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+
+                        <span>Status filtern:</span>
+
+                        <div style="display: flex; gap: 6px; align-items: center; width: 100%;">
+                            <h:selectOneMenu id="statusFilter"
+                                             value="#{geisternetzController.statusFilter}"
+                                             style="flex: 1; padding: 4px; font-size: 0.9em;">
+                                <f:selectItem itemLabel="Alle" itemValue="" />
+                                <f:selectItem itemLabel="GEMELDET" itemValue="GEMELDET" />
+                                <f:selectItem itemLabel="BERGUNG_BEVORSTEHEND" itemValue="BERGUNG_BEVORSTEHEND" />
+                                <f:selectItem itemLabel="GEBORGEN" itemValue="GEBORGEN" />
+                                <f:selectItem itemLabel="VERSCHOLLEN" itemValue="VERSCHOLLEN" />
+                            </h:selectOneMenu>
+
+                            <h:commandButton value="🔍"
+                                             title="Filtern"
+                                             action="#{geisternetzController.filterAnwenden}"
+                                             style="padding: 4px 8px; background: #4da6ff; color: white; border: none; border-radius: 4px; cursor: pointer;" />
+                        </div>
+                    </div>
+                </f:facet>
+                #{netz.status}
+            </h:column>
+        </h:dataTable>
+    </h:form>
+</h:body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html">
+<head>
+    <title>Meldung erfolgreich</title>
+    <meta http-equiv="refresh" content="7;url=index.xhtml" />
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .message-box {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .message-box h1 {
+            color: #00aaff;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .message-box p {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        .button:hover {
+            background: #0056b3;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+<div class="message-box">
+    <h1>✔️ Danke für dein Engagement!</h1>
+    <p>Deine Meldung wurde erfolgreich übermittelt.</p>
+    <p>Du wirst automatisch in wenigen Sekunden weitergeleitet...</p>
+
+    <h:form>
+        <h:commandButton value="Zur Startseite"
+                         action="index.xhtml?faces-redirect=true"
+                         styleClass="button" />
+    </h:form>
+</div>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+<h:head>
+    <title>Ghost Net App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        body { font-family: Arial, sans-serif; background: #181818; color: #fff; margin: 0; }
+        .navbar {
+            display: flex;
+            background: #111;
+            padding: 10px 20px;
+            align-items: center;
+            gap: 20px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .navbar a:hover {
+            background: #333;
+            border-radius: 5px;
+        }
+
+        /* Container für Inhalt */
+        .content-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 80%;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        /* Linke Spalte (Text) */
+        .text-section {
+            width: 50%;
+        }
+
+        .text-section h1 {
+            color: #00aaff;
+            font-size: 28px;
+        }
+
+        .text-section p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #ddd;
+        }
+
+        /* Rechte Spalte (Bild) */
+        .image-section {
+            width: 45%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .image-section img {
+            max-width: 100%;
+            opacity: 0.5; /* 50% Sichtbarkeit */
+            height: auto;
+            border-radius: 8px;
+        }
+
+        /* Button-Styling */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        /* Responsive Anpassung */
+        @media (max-width: 900px) {
+            .content-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .text-section, .image-section {
+                width: 100%;
+            }
+            .image-section {
+                margin-top: 20px;
+            }
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <!-- Navigation -->
+    <div class="navbar">
+        <h:link outcome="index" value="">
+            <i class="fas fa-home"></i> Startseite
+        </h:link>
+        <h:link outcome="karte" value="">
+            <i class="fas fa-map-marked-alt"></i> Karte
+        </h:link>
+        <h:link outcome="datenbank" value="">
+            <i class="fas fa-database"></i> Datenbank
+        </h:link>
+        <h:link outcome="netzmeldung" value="">
+            <i class="fas fa-exclamation-triangle"></i> Netzmeldung
+        </h:link>
+        <h:link outcome="faq" value="">
+            <i class="fas fa-question-circle"></i> FAQ
+        </h:link>
+    </div>
+
+    <!-- Hauptinhalt -->
+    <div class="content-container">
+        <!-- Text -->
+        <div class="text-section">
+
+            <h1>Rettet die Meere – Stoppt Geisternetze!</h1>
+            <p>
+                Tausende verlassene Fischernetze treiben unkontrolliert durch unsere Ozeane und werden zu tödlichen Fallen für Meerestiere.
+                Jährlich verenden unzählige Fische, Schildkröten und andere Meeresbewohner in diesen sogenannten Geisternetzen.
+            </p>
+
+            <p>
+                Mit unserer Plattform helfen wir, Geisternetze zu lokalisieren, ihre Bergung zu koordinieren und das Meer Stück für Stück sicherer zu machen.
+            </p>
+
+            <p>
+                Über die Navigationsleiste könnt ihr zur <strong>Kartenansicht</strong> wechseln und alle bekannten Geisternetze einsehen.
+                Falls ihr ein Netz gesichtet habt, könnt ihr es unter <strong>„Netzmeldung“</strong> eintragen.
+                Wer sich aktiv an der Bergung beteiligen möchte, kann dies unter <strong>„Bergung“</strong> anmelden –
+                oder eine bereits abgeschlossene Bergung bestätigen, damit das Netz aus dem System entfernt wird.
+            </p>
+
+            <p><strong>Lasst uns gemeinsam die Meere schützen – jedes gerettete Netz zählt!</strong></p>
+
+            <h:form>
+                <h:commandButton value="Zu den Geisternetzen" action="karte.xhtml?faces-redirect=true" styleClass="btn"/>
+            </h:form>
+        </div>
+
+        <!-- Bild -->
+        <div class="image-section">
+            <h:graphicImage name="ghostnet_info.jpg" library="images" alt="Geisternetz Illustration"/>
+        </div>
+    </div>
+</h:body>
+</html>
